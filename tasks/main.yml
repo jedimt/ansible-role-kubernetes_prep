@@ -5,6 +5,7 @@
   ansible.builtin.file:
     path: "/root/.ssh"
     state: directory
+    mode: '644'
 
 - name: Check for existing authorized_keys file
   ansible.builtin.stat: path=/root/.ssh/authorized_keys
@@ -14,67 +15,44 @@
 - name: Create empty authorized_keys file for root user account
   ansible.builtin.file:
     path: "/root/.ssh/authorized_keys"
+    mode: '644'
     state: touch
 
 - name: Copy public SSH key into root users authorized_keys file
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: "/root/.ssh/authorized_keys"
     line: "{{ pubkey }}"
 
 # Docker install and configuration
 - name: Install prerequisite packages
-  block:
-    - name: update apt
-      apt: 
-        name:  
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg-agent
-          - software-properties-common
-          - lsscsi
-        state: present
-        update_cache: yes
-        cache_valid_time: 3600
+  ansible.builtin.apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg-agent
+      - software-properties-common
+      - lsscsi
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
   tags: apt
-  
-  rescue:
-    - name: apt update error caught
-      ansible.builtin.debug:
-        msg: apt update failed to complete
-
-    - name: Remove APT locks
-      ansible.builtin.shell:
-        cmd: |
-          killall apt apt-get
-
-    - name: retry update apt
-      ansible.builtin.apt: 
-        name:  
-          - apt-transport-https
-          - ca-certificates
-          - curl
-          - gnupg-agent
-          - software-properties-common
-        state: present
-        update_cache: yes
-        cache_valid_time: 3600
 
 # The Docker key and repo must be added to install containerd
 - name: Add Docker GPG key
-  ansible.builtin.apt_key: 
+  ansible.builtin.apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
   register: apt_result
   until: apt_result is success
   retries: 5
   delay: 5
-  ignore_errors: True
+  ignore_errors: true
 
 # The Docker key and repo must be added to install containerd
 - name: Add Docker APT repository
   ansible.builtin.apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/{{ansible_distribution|lower}} {{ansible_distribution_release}} stable
+    repo: deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution|lower }} {{ ansible_distribution_release }} stable
     state: present
 
 - name: Add K8s GPG key
@@ -85,7 +63,7 @@
   until: apt_result is success
   retries: 5
   delay: 5
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Build sources list for apt on Ubuntu
   ansible.builtin.shell:
@@ -93,7 +71,6 @@
       cat <<EOF | tee /etc/apt/sources.list.d/kubernetes.list
       deb http://packages.cloud.google.com/apt/ kubernetes-xenial main
       EOF
-    #changed_when: false
 
 - name: Install Helm GPG Key
   ansible.builtin.apt_key:
@@ -103,18 +80,18 @@
   until: apt_result is success
   retries: 5
   delay: 5
-  ignore_errors: True
+  ignore_errors: true
 
 - name: Determine Ubuntu Build
-  ansible.builtin.shell: grep -i codename -m 1 /etc/os-release
+  ansible.builtin.command: grep -i codename -m 1 /etc/os-release
   register: ubuntu_version
   changed_when: false
-  tags: 
+  tags:
     - ubuntu_version
     - docker
 
-- name: Install Helm for Ubuntu 
-  ansible.builtin.shell:
+- name: Install Helm for Ubuntu
+  ansible.builtin.command:
     cmd: |
       curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
       chmod 700 get_helm.sh
@@ -149,30 +126,30 @@
       net.ipv4.ip_forward                 = 1
       net.bridge.bridge-nf-call-ip6tables = 1
       EOF
-    #changed_when: creates
 
 - name: Reload sysctl to pick up iptables changes
-  ansible.builtin.shell: "sysctl --system"
+  ansible.builtin.command: "sysctl --system"
   changed_when: false
 
 - name: Install container runtime Ubuntu 20
   ansible.builtin.apt:
-    name: 
-    - containerd.io
+    name:
+      - containerd.io
     state: present
-    update_cache: yes
-  # when: "('focal' in ubuntu_version.stdout) and (not docker_installed.stat.exists)"
+    update_cache: true
   tags: docker
 
 # Configure containerd
 - name: Create /etc/containerd file
-  file:
+  ansible.buildin.file:
     path: "/etc/containerd"
-    state: touch    
+    mode: '644'
+    state: touch
 
 - name: Configure containerd
-  shell: |
-    containerd config default | tee /etc/containerd/config.toml
+  ansible.builtin.shell:
+    cmd: |
+      containerd config default | tee /etc/containerd/config.toml
 
 # Statically define systemd as cgroup driver for containerd
 - name: Set runc as systemd cgroup driver
@@ -183,17 +160,16 @@
   tags: containerd
 
 - name: Restart containerd
-  systemd:
+  ansible.builtin.systemd:
     state: restarted
-    daemon_reload: yes
+    daemon_reload: true
     name: containerd
 
-#Kubernetes specific work
+# Kubernetes specific work
 - name: Turn off swap device (required for K8s)
-  ansible.builtin.shell: |
-    swapoff -a
+  ansible.builtin.command: swapoff -a
 
-- name: Disable SWAP in fstab 
+- name: Disable SWAP in fstab
   ansible.builtin.replace:
     path: /etc/fstab
     regexp: '^([^#].*?\sswap\s+sw\s+.*)$'
@@ -201,13 +177,13 @@
 
 - name: Install kubeadm, kubelet, kubectl
   ansible.builtin.apt:
-    name: 
-    - kubelet={{k8sversion}}
-    - kubeadm={{k8sversion}}
-    - kubectl={{k8sversion}}
+    name:
+      - kubelet={{ k8sversion }}
+      - kubeadm={{ k8sversion }}
+      - kubectl={{ k8sversion }}
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Turn off firewall
-  community.general.ufw: 
+  community.general.ufw:
     state: disabled
