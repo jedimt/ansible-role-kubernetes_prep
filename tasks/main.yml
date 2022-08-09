@@ -91,7 +91,7 @@
     - docker
 
 - name: Install Helm for Ubuntu
-  ansible.builtin.command:
+  ansible.builtin.shell:
     cmd: |
       curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
       chmod 700 get_helm.sh
@@ -141,7 +141,7 @@
 
 # Configure containerd
 - name: Create /etc/containerd file
-  ansible.buildin.file:
+  ansible.builtin.file:
     path: "/etc/containerd"
     mode: '644'
     state: touch
