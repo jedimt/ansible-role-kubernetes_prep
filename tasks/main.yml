@@ -1,29 +1,7 @@
 ---
 # tasks file for nebulon.kubernetes_prep
 
-- name: Make .ssh directory for root user
-  ansible.builtin.file:
-    path: "/root/.ssh"
-    state: directory
-    mode: '644'
-
-- name: Check for existing authorized_keys file
-  ansible.builtin.stat: path=/root/.ssh/authorized_keys
-  register: precondition
-  changed_when: false
-
-- name: Create empty authorized_keys file for root user account
-  ansible.builtin.file:
-    path: "/root/.ssh/authorized_keys"
-    mode: '644'
-    state: touch
-
-- name: Copy public SSH key into root users authorized_keys file
-  ansible.builtin.lineinfile:
-    path: "/root/.ssh/authorized_keys"
-    line: "{{ pubkey }}"
-
-# Docker install and configuration
+# Install required packages
 - name: Install prerequisite packages
   ansible.builtin.apt:
     name:
