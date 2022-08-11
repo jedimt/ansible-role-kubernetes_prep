@@ -2,9 +2,6 @@
 # vars file for nebulon.kubernetes_prep
 # All values are case sensitive, except where noted
 
-# Public key to install in all servers for passwordless access
-pubkey: "{{ vault_pubkey }}"
-
 # Kubernetes binary versions to install
 # K8s versions (curl): curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
 # K8s versions (apt-cache): apt-cache madison kubeadm
