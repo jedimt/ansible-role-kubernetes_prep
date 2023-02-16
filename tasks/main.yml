@@ -5,45 +5,6 @@
 # Move Helm install into its own role
 # - https://github.com/gantsign/ansible_role_helm/blob/master/tasks/main.yml
 
-
-# Set up SSH keys for root user
-- name: Check for existing .ssh directory
-  ansible.builtin.stat:
-    path: /root/.ssh/
-  register: ssh_precondition
-  changed_when: false
-
-- name: Make .ssh directory for root user
-  ansible.builtin.file:
-    path: "/root/.ssh"
-    mode: '0644'
-    state: directory
-  when: ssh_precondition.stat.exists == 'false'
-
-- name: Check for existing authorized_keys file
-  ansible.builtin.stat:
-    path: /root/.ssh/authorized_keys
-  register: precondition
-  changed_when: false
-
-- name: Create empty authorized_keys file for root user account
-  ansible.builtin.file:
-    path: "/root/.ssh/authorized_keys"
-    state: touch
-    mode: '0600'
-  register: file_created
-  when: precondition.stat.exists == 'false'
-
-- name: Add Authorized keys from ansible-vault
-  ansible.posix.authorized_key:
-    user: root
-    state: present
-    key: "{{ item }}"
-  loop: "{{ vault_pubkeys }}"
-  loop_control:
-    label: "Added SSH key to {{ inventory_hostname }}"
-  tags: ssh
-
 # Install required packages
 - name: Install prerequisite packages
   ansible.builtin.apt:
