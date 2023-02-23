@@ -6,7 +6,7 @@
 # K8s versions (apt-cache): apt-cache madison kubeadm
 # N-2 k8s versions as of Aug 2022: 1.22.12-00 1.23.9-00 1.24.3-00
 # For Nebulon CSI driver versions < 0.1.10 we require K8s version 1.21 or earlier
-k8sversion: "1.24.10-00"
+k8sversion: "1.25.6-00"
 
 # Docker GPG key URL, required for installing containerd
 docker_gpg_url: "https://download.docker.com/linux/ubuntu/gpg"

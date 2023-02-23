@@ -16,6 +16,7 @@
       - software-properties-common
       - lsscsi
       - jq
+      - arping
     state: present
     update_cache: true
     cache_valid_time: 3600
