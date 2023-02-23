@@ -55,21 +55,6 @@
     state: present
   tags: k8s_gpg
 
-# - name: Check for existing Helm install
-#   ansible.builtin.command:
-#     which helm
-#   register: helm_check
-#   changed_when: false
-#   failed_when: helm_check.rc > 1
-
-# - name: Install Helm for Ubuntu
-#   ansible.builtin.command:
-#     cmd: |
-#       curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
-#       chmod 700 get_helm.sh
-#       ./get_helm.sh
-#   when: helm_check.rc != 0
-
 # Containerd configuration
 # Populate containerd.conf file
 
