@@ -1,0 +1,9 @@
+---
+# defaults file for jedimt.kubernetes_prep
+
+# Kubernetes binary versions to install
+# K8s versions (curl): curl -s https://packages.cloud.google.com/apt/dists/kubernetes-xenial/main/binary-amd64/Packages | grep Version | awk '{print $2}'
+# K8s versions (apt-cache): apt-cache madison kubeadm
+# N-2 k8s versions as of Aug 2022: 1.22.12-00 1.23.9-00 1.24.3-00
+# For Nebulon CSI driver versions < 0.1.10 we require K8s version 1.21 or earlier
+k8sversion: "1.25.6-00"

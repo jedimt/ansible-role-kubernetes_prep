@@ -1,9 +1,5 @@
 ---
-# tasks file for ansible-role-kubernetes-prep
-
-# To Do:
-# Move Helm install into its own role
-# - https://github.com/gantsign/ansible_role_helm/blob/master/tasks/main.yml
+# tasks file for jedimt.kubernetes_prep
 
 # Install required packages
 - name: Install prerequisite packages

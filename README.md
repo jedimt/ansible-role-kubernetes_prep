@@ -35,15 +35,15 @@ Example Playbook
     # Kubernetes pre-install tasks
     # ===========================================================================
     - name: Kubernetes pre-install tasks
-    hosts: servers
-    tags: k8s
+      hosts: servers
+      tags: k8s
 
-    vars_files:
+      vars_files:
         # Ansible vault with all required passwords
         - "../../credentials.yml"
 
-    roles:
-        - ansible-role-kubernetes-prep
+      roles:
+        - jedimt.kubernetes_prep
 
 License
 -------
