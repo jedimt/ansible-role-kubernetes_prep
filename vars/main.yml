@@ -5,6 +5,14 @@
 docker_gpg_url: "https://download.docker.com/linux/ubuntu/gpg"
 
 # Kubernetes GPG key URL
+<<<<<<< HEAD
 # k8s_gpg_url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
 # Updating key location. See https://github.com/kubernetes/k8s.io/pull/4837#issuecomment-1446426585
 k8s_gpg_url: https://dl.k8s.io/apt/doc/apt-key.gpg
+=======
+# Changing key location due to issues downloading key at prior location.
+# See https://github.com/kubernetes/k8s.io/pull/4837#issuecomment-1446426585
+# k8s_gpg_url: "https://packages.cloud.google.com/apt/doc/apt-key.gpg"
+
+k8s_gpg_url: "https://dl.k8s.io/apt/doc/apt-key.gpg"
+>>>>>>> 8b63dc356e8f84d8c941c1191cdc1e27e496d576
